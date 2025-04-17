@@ -1,1 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <h1>ZELDYM GAMING</h1>
+  <title>ZELDYM GAMING</title>
+
+  <!-- tsParticles CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
+  
+  <style>
+/* RESET AND GLOBAL */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #000000;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* PARTICLE BACKGROUND */
+#tsparticles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* CONTAINER LAYOUT */
+#container {
+  display: flex;
+  height: 100vh;
+}
+
+/* NAVIGATION */
+nav {
+  width: 220px;
+  background: rgba(20, 20, 20, 0.85);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
+nav img {
+  width: 160px;
+  margin-bottom: 30px;
+}
+
+nav button {
+  color: white;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s, color 0.3s;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: slideIn 0.5s ease forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+nav button:nth-child(1) { animation-delay: 0.3s; }
+nav button:nth-child(2) { animation-delay: 0.5s; }
+nav button:nth-child(3) { animation-delay: 0.7s; }
+
+nav button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+  color: #00ffff;
+}
+
+/* MAIN CONTENT */
+main {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 1;
+  position: relative;
+}
+
+/* SECTIONS */
+section {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+section.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* SEARCH BAR */
+.search-bar {
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 20px;
+  background-color: #222;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 5px;
+}
+
+/* GAME GRID */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller cards */
+  gap: 40px 30px; /* More space between */
+  padding: 40px 20px; /* Padding around the grid */
+}
+
+
+/* GAME CARD */
+.game-card {
+  background: #1e1e1e;
+  padding: 10px; /* Less padding = smaller */
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 10px #000;
+  transition: transform 0.2s ease, box-shadow 0.2s;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.6s ease forwards, floaty 4s ease-in-out infinite;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  position: relative;
+}
+
+
+.game-card:hover {
+  transform: rotateY(5deg) rotateX(5deg);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+}
+
+.game-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+
+.game-card::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #0ff, #00f, #f0f, #0ff);
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 10px;
+}
+
+.game-card:hover::before {
+  opacity: 1;
+  animation: borderGlow 3s linear infinite;
+}
+
+.game-card:active::after {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(0, 255, 255, 0.5);
+  border-radius: 50%;
+  animation: rippleEffect 0.6s ease-out;
+  pointer-events: none;
+}
+
+/* FULLSCREEN GAME */
+.fullscreen-game {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.fullscreen-game iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* BACK BUTTON */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: rgb(47, 58, 216);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.back-button:hover {
+  background-color: #333;
+}
+
+/* CLICK PARTICLES */
+.click-particles {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #0ff, #00f);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: explode 0.4s ease-out forwards;
+}
+
+/* HEADINGS */
+h1, p {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+
+
+/* ANIMATIONS */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes borderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes rippleEffect {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(5);
+    opacity: 0;
+  }
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes explode {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(5); opacity: 0; }
+}
+
+
+  </style>
+</head>
+<body>
+  <script>
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("keydown", (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && e.key.toLowerCase() === "u")
+      ) {
+        e.preventDefault();
+      }
+    });
+    let devtoolsOpen = false;
+    const checkDevTools = () => {
+      const threshold = 160;
+      if ((window.outerWidth - window.innerWidth > threshold) ||
+          (window.outerHeight - window.innerHeight > threshold)) {
+        devtoolsOpen = true;
+        window.location.replace("google.com");
+      } else {
+        devtoolsOpen = false;
+      }
+    };
+    setInterval(checkDevTools, 1000);
+  </script>
+  <!-- Add this span inside each .game-card -->
+<span class="click-particles"></span>
+
+  
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.game-card');
+    cards.forEach((card, i) => {
+      card.style.animationDelay = `${i * 0.1}s`;
+    });
+
+    // Hover effects on nav buttons
+    document.querySelectorAll('nav button').forEach(button => {
+      button.addEventListener('mousemove', e => {
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        button.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+      });
+
+      button.addEventListener('mouseleave', () => {
+        button.style.transform = 'translate(0, 0)';
+      });
+    });
+
+    // Initialize tsParticles
+    tsParticles.load("tsparticles", {
+      fullScreen: { enable: false },
+      background: { color: "#000000" },
+      particles: {
+        number: {
+          value: 80,
+          density: {
+            enable: true,
+            area: 800
+          }
+        },
+        color: {
+          value: "#b200ff"
+        },
+        shape: {
+          type: "circle"
+        },
+        opacity: {
+          value: 0.5,
+          random: true
+        },
+        size: {
+          value: { min: 1, max: 4 },
+          random: true
+        },
+        move: {
+          enable: true,
+          speed: 1,
+          direction: "top",
+          outModes: {
+            default: "out"
+          }
+        }
+      },
+      interactivity: {
+        events: {
+          onHover: { enable: true, mode: "repulse" },
+          onClick: { enable: true, mode: "push" }
+        },
+        modes: {
+          repulse: {
+            distance: 100,
+            duration: 0.4
+          },
+          push: {
+            quantity: 4
+          }
+        }
+      },
+      detectRetina: true
+    });
+  });
+
+
+  function searchGames() {
+    const input = document.getElementById('gameSearch');
+    const query = input.value.trim().toLowerCase();
+    const gameCards = document.querySelectorAll('.game-card');
+
+    gameCards.forEach(card => {
+      const text = card.textContent.trim().toLowerCase();
+      card.style.display = text.includes(query) ? '' : 'none';
+    });
+  }
+
+  function openGame(url) {
+    const loader = document.getElementById('loader');
+    const gameIframe = document.getElementById('gameIframe');
+    const fullscreenGame = document.getElementById('fullscreenGame');
+
+    if (loader) loader.style.display = 'flex';
+    fullscreenGame.style.display = 'flex';
+    gameIframe.onload = () => loader && (loader.style.display = 'none');
+    gameIframe.src = url;
+  }
+
+  function closeGame() {
+    const fullscreenGame = document.getElementById('fullscreenGame');
+    const gameIframe = document.getElementById('gameIframe');
+    fullscreenGame.style.display = 'none';
+    gameIframe.src = '';
+  }
+</script>
+
+  
+ 
+
+  
+  
+<!-- Particle Background -->
+<div id="tsparticles"></div>
+
+<!-- Fullscreen Game View -->
+<div class="fullscreen-game" id="fullscreenGame">
+  <button class="back-button" onclick="closeGame()">⬅ Back</button>
+  <iframe id="gameIframe"></iframe>
+</div>
+
+<div id="container">
+  <!-- Navigation Sidebar -->
+  <nav>
+    
+    <button onclick="switchSection('games')">🎮 Games</button>
+    <button onclick="switchSection('hall')">🏆 Hall of Fame</button>
+    <button onclick="switchSection('news')">📰 News</button>
+</nav>
+
+  <main>
+    <!-- Games Section -->
+    <section id="games" class="active">
+      <h1>🎮 Play a Game</h1>
+      <input type="text" id="gameSearch" class="search-bar" placeholder="Search for a game..." oninput="searchGames()" />
+      <div class="game-grid" id="gameGrid">
+        <div class="game-card" data-game-name="Tomb of the Mask" onclick="openGame('https://tomb-of-the-mask-online.github.io/file/')">
+          <img src="tombofthemask.png" alt="Tomb of the Mask" />
+          <p>Tomb of the Mask</p>
+        </div>
+        <div class="game-card" data-game-name="Shadow Browser" onclick="openGame('https://scaredofthedark.radarvision.co.za/')">
+          <img src="Screenshot 2025-04-14 193116.png" alt="Shadow Browser" />
+          <p>Shadow Browser</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/bitlife/index.html')">
+          <img src="Bitlife.png" alt="Bitlife" />
+          <p>Bitlife</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://classlinx.github.io/Games.html')">
+          <img src="Screenshot 2025-04-14 193506.png" alt="Afterlife Gaming" />
+          <p>Afterlife Gaming</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://jake1283645473.github.io/AbyanIsBetter/')">
+          <img src="MonkeyGG2.png" alt="MonkeyGG2" />
+          <p>MonkeyGG2</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://ruskcoder.github.io/')">
+          <img src="Screenshot 2025-04-14 195420.png" alt="Rusk Games" />
+          <p>Rusk Games</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://skibidijglkdjlkghoieyu.github.io/games/stickman-hook/')">
+          <img src="Screenshot 2025-04-14 200259.png" alt="Stickman Hook" />
+          <p>Stickman Hook</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://astroid5710.github.io/polytrack-clone/')">
+          <img src="Screenshot 2025-04-14 201011.png" alt="Polytrack" />
+          <p>Polytrack</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://quiz-60.github.io/')">
+          <img src="Screenshot 2025-04-14 201739.png" alt="quiz-60" />
+          <p>quiz-60</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://gameverse.global.ssl.fastly.net/games')">
+          <img src="Screenshot 2025-04-14 204604.png" alt="Gameverse" />
+          <p>Gameverse</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://yurm.c.power-media.ro/')">
+          <img src="Screenshot 2025-04-14 203027.png" alt="Compass" />
+          <p>Compass</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://skibidijglkdjlkghoieyu.github.io/games/subway-surfers/')">
+          <img src="Screenshot 2025-04-15 102127.png" alt="Subway Surfers" />
+          <p>Subway Surfers</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://link2.chopez.com.ar/g')">
+          <img src="Screenshot 2025-04-15 102304.png" alt="Space" />
+          <p>Space</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/slope/index.html')">
+          <img src="Screenshot 2025-04-15 135154.png" alt="Slope" />
+          <p>Slope</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddleschool1/index.html')">
+          <img src="Screenshot 2025-04-15 135948.png" alt="Riddle School" />
+          <p>Riddle School</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddleschool2/index.html')">
+          <img src="riddle 2.png" alt="Riddle School 2" />
+          <p>Riddle School 2</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddleschool3/index.html')">
+          <img src="riddle 3.png" alt="Riddle School 3" />
+          <p>Riddle School 3</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddleschool4/index.html')">
+          <img src="riddle 4.png" alt="Riddle School 4" />
+          <p>Riddle School 4</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddleschool5/index.html')">
+          <img src="riddle 5.png" alt="Riddle School 5" />
+          <p>Riddle School 5</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddletransfer/index.html')">
+          <img src="Screenshot 2025-04-15 141738.png" alt="Riddle Transfer" />
+          <p>Riddle Tranfer</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/riddleschool/riddletransfer2/index.html')">
+          <img src="riddle transfer 2.png" alt="Riddle Transfer 2" />
+          <p>Riddle Tranfer 2</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/flappybird/index.html')">
+          <img src="Screenshot 2025-04-15 142359.png" alt="Flappy Bird" />
+          <p>Flappy Bird</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/tetris/tetris.html')">
+          <img src="Screenshot 2025-04-15 142526.png" alt="Tetris" />
+          <p>Tetris</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://hub-pro.github.io/games/2048/index.html')">
+          <img src="Screenshot 2025-04-15 142932.png" alt="2048" />
+          <p>2048</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://betterbull.com/uploads/5/5/6/7/5567194/custom_themes/811766381464516446/files/index.html')">
+          <img src="Ironsnout.png" alt="Ironsnout" />
+          <p>Ironsnout</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://skibidijglkdjlkghoieyu.github.io/games/drift-boss/')">
+          <img src="Driftboss.png" alt="Drift Boss" />
+          <p>Drift Boss</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://skibidijglkdjlkghoieyu.github.io/games/retro-bowl/')">
+          <img src="Retrobowl.png" alt="Retrobowl" />
+          <p>Retrobowl</p>
+        </div>
+        <div class="game-card" data-game-name="Example Game" onclick="openGame('https://basket-random-game.github.io/file/')">
+          <img src="Basket Random.png" alt="Basket Random" />
+          <p>Basket Random</p>
+        </div>
+
+        <!-- Add more games as needed -->
+      </div>
+    </section>
+
+    <!-- Hall of Fame Section -->
+    <section id="hall">
+      <h1>🏆 Hall of Fame</h1>
+      <h2>Top scores and shotouts go here.</h2>
+      <p>ty mally for afterlife gaming and shoutout to pigmaissigma, aristo and scullzy.</p>
+
+    </section>
+     
+    <!-- News Section -->
+    <section id="news">
+      <h1>📰 News</h1>
+   <p>New Website what do you think?</p>
+
+</div>
+
+
+
+
+
+
+
+<script>
+  // Initialize tsParticles
+  tsParticles.load("tsparticles", {
+  fullScreen: { enable: false },
+  background: { color: "#000000" },
+  particles: {
+    number: {
+      value: 80,
+      density: {
+        enable: true,
+        area: 800
+      }
+    },
+    color: {
+      value: "#b200ff"
+    },
+    shape: {
+      type: "circle"
+    },
+    opacity: {
+      value: 0.5,
+      random: true
+    },
+    size: {
+      value: { min: 1, max: 4 },
+      random: true
+    },
+    move: {
+      enable: true,
+      speed: 1,
+      direction: "top",
+      random: false,
+      straight: false,
+      outModes: {
+        default: "out"
+      }
+    },
+    links: {
+      enable: false
+    }
+  },
+  interactivity: {
+    events: {
+      onHover: { enable: true, mode: "repulse" },
+      onClick: { enable: true, mode: "push" },
+      resize: true
+    },
+    modes: {
+      repulse: {
+        distance: 100,
+        duration: 0.4
+      },
+      push: {
+        quantity: 4
+      }
+    }
+  },
+  detectRetina: true
+});
+
+
+  function switchSection(sectionId) {
+    const sections = document.querySelectorAll('main section');
+    sections.forEach(section => section.classList.remove('active'));
+    const activeSection = document.getElementById(sectionId);
+    if (activeSection) activeSection.classList.add('active');
+  }
+
+  function searchGames() {
+  const input = document.getElementById('gameSearch');
+  const query = input.value.trim().toLowerCase();
+  const gameCards = document.querySelectorAll('.game-card');
+
+  gameCards.forEach(card => {
+    const text = card.textContent.trim().toLowerCase();
+    card.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+
+
+
+
+
+  function openGame(url) {
+    const gameIframe = document.getElementById('gameIframe');
+    const fullscreenGame = document.getElementById('fullscreenGame');
+    gameIframe.src = url;
+    fullscreenGame.style.display = 'flex';
+  }
+a
+  function closeGame() {
+    const fullscreenGame = document.getElementById('fullscreenGame');
+    const gameIframe = document.getElementById('gameIframe');
+    fullscreenGame.style.display = 'none';
+    gameIframe.src = '';
+  }
+</script>
+
+</body>
+</html>
 
